@@ -2,6 +2,7 @@
 ```bash
 git clone remote-url localdir # 把默认的库在本地文件夹的名字，改成localdir
 git clone remote-url --bare # 把远程仓库克隆为bare无工作区仓库
+git -c user.name="X" -c user.email="x@xx.com" clone # 临时身份克隆，具体啥意思，没用过
 git branch -M main # 把当前分支名改成main
 git branch --set-upstram-to oragin/br1 local-br # 如果远程的br1和本地的local-br不一样，在push的时候还是不行，还得指定 分支名，真是奇了怪了
 git push -u oragin lcoal-br:remote-br
@@ -60,13 +61,22 @@ git reset --hard # 从仓库区更新到，暂存区，更新到工作区
 git reset --mix  # 从仓库区更新到，暂存区，工作区不变
 git reset --soft # 更新仓库区的指针，暂存区不变，工作区也不变
 
-git restore  # 放弃工作区变更的文件的内容，恢复到未变更状态
+git restore --source=<commit-hash> <file-path>
+# 放弃工作区变更的文件的内容，恢复到未变更状态
 
 git commit --date # 可以修改时间 
             --author # 可以指定 用户名和邮箱
 git commit --amend --no-edit # 保持commit信息不变  
+            --reset-author # 修改作者时间和提交时间
+            --date="now" # 修改作者时间和提交时间（同上）
 
 git rebase  # 变基 可以修改每个节点的信息，一旦修改某个节点，之后的节点的hash值，全部要重新计算
+# 可以调整提交范围内的顺序也可以合并临近的提交 squash 就是干这个事的
+
+git rebase --onto newbase from to
+# 和 git rebase的差异性在于
+# rebase 只是两个分支而言
+# onto 带有一个范围，前开后闭
 
 git log --format='%H %<(20,trunc)%s'
 ## 显示的内容在20个字符后截断，也就是最长显示20个字符内容
@@ -75,6 +85,29 @@ git log --reverse --oneline | head -1
 git log --oneline | tail -1 
 # 获取commit最初的，也即第一条提交
 
+git log --oneline --follow -- app.txt
+# 获取 app.txt 最早出现的提交
+
+git log <branch-name> ...
+# 查看另一个分支的log
+
+git clean -nfdx
+# n 模拟看看那些将被清除
+# f 清除本地未跟踪的文件
+# f 清除本地未跟踪的目录
+# x 清除本地被忽略的文件
+
+git cherry-pick <commit-id> # 某个提交
+git cherry-pick <commit-id1> <commit-id2> # 多个提交
+git cherry-pick <commit-id1>^..<commit-id2> # 范围id1是旧的，id2是新的
+# 如果发生冲突，git add . 后，不需要手动commit，执行git cherry-pick --continue 会自动进行commit
+# cherry-pick多个提交时，会对应一对一多个提交，不会进行合并
+
+git diff <commit-id1> <commit-id2> --ignore-cr-at-eof # 忽略cr的不同
+git diff --ignore-space-at-eof
+git diff -b/--ignore-space-change
+git diff -w/--ignore-all-space
+git diff --diff-filter=M # 只比较改动的文件
 ```
 
 ## 高级指令--对历史数据-批量调整
@@ -103,3 +136,49 @@ fi
 
 ' --tag-name-filter cat -- --branches --tags
 ```
+
+示例2： 文件夹和文件处理
+```bash
+git filter-branch --index-filter
+```
+
+```bash
+git mv xxx xxx # 不能用在index-filter上
+git rename --cached xxx xxx # 这个可以
+```
+
+tree-filter的用法
+`git filter-branch --tree-filter`
+
+```bash
+git 
+```
+
+
+# 惊奇点
+你先对本地的变化进行stash，然后你对本地进行了变基，导致commit都变了，再次stash pop时，是不会merge的，会提示如下：直接abort了
+```bash
+long@dev001:/mnt/d/dev/git$ git -v
+git version 2.43.0
+long@dev001:/mnt/d/dev/git$ git stash pop
+error: Your local changes to the following files would be overwritten by merge:
+        git.md
+Please commit your changes or stash them before you merge.
+Aborting
+```
+因为这已经不是同一个代码库了，我想了好久，这个解释应该是正确的
+
+
+# QA
+前提条件：当前本地库和远程库状态一致  
+然后，用git commit --amend --author 只修改了用户和邮箱  
+然后，再调用 git pull --rebase，
+```bash
+long@dev001:/mnt/d/dev/git$ git pull --rebase
+warning: skipped previously applied commit bf9a508
+hint: use --reapply-cherry-picks to include skipped commits
+hint: Disable this message with "git config advice.skippedCherryPicks false"
+Successfully rebased and updated refs/heads/main.
+```
+结果，提示 直接 ***跳过原来的修改*** ，直接给 ***复原*** 成了原来的  
+这是 ***为啥*** 呢？
