@@ -97,6 +97,12 @@ git clean -nfdx
 # f 清除本地未跟踪的目录
 # x 清除本地被忽略的文件
 
+git checkout --ours <filenames>
+git checkout --theirs <filenames>
+# 一旦发生冲突，这两个可以任意检出，数据都还在，直到提交到暂存区中
+# theris: stashed or remotes
+# ours: current
+
 git cherry-pick <commit-id> # 某个提交
 git cherry-pick <commit-id1> <commit-id2> # 多个提交
 git cherry-pick <commit-id1>^..<commit-id2> # 范围id1是旧的，id2是新的
@@ -108,7 +114,23 @@ git diff --ignore-space-at-eof
 git diff -b/--ignore-space-change
 git diff -w/--ignore-all-space
 git diff --diff-filter=M # 只比较改动的文件
+
+git tag -a v1.0.0 -m "version 1.0.0" # 创建标签
+git tag -d <tagname> # 删除标签
+git tag --list # 列出标签
+git push origin v1.0.0 # 推送到远程标签
 ```
+## 标签和分支的不同
+| 特性         | 标签（Tag）| 分支（Branch）|
+|--------------|---------------------|----------------------------|
+| **目的**     | 标记特定时间点的状态（如版本发布） | 支持持续开发的代码线             |
+| **可变性**   | 固定不变（指向特定提交）          | 可移动（随新提交向前移动）         |
+| **生命周期** | 永久性标记（除非手动删除）        | 临时性（通常合并后删除）           |
+| **数量关系** | 一个提交可有多个标签              | 一个提交只能属于一个分支（HEAD位置）|
+
+标签：静态指针  
+分支：动态指针  
+两者其基础机制，是一样的，只是Tag增加了很多约束
 
 ## 高级指令--对历史数据-批量调整
 
