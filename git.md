@@ -7,6 +7,11 @@ git branch -M main # 把当前分支名改成main
 git branch --set-upstram-to oragin/br1 local-br # 如果远程的br1和本地的local-br不一样，在push的时候还是不行，还得指定 分支名，真是奇了怪了
 git push -u oragin lcoal-br:remote-br
 git push -u oragin local-br # 如果不加":"，代表本地分支名
+
+# 创建分支
+git brach <branch-name>
+git checkout -b <branch-name>
+git switch -c <branch-name>
 ```
 
 # git 原理
@@ -90,6 +95,14 @@ git log --oneline --follow -- app.txt
 
 git log <branch-name> ...
 # 查看另一个分支的log
+
+git log --pretty=full
+# 显示所有信息，这里有两个信息，author和committer，这两者可以是不一样的
+
+git restore .
+# 放弃本地所有的修改
+git restore --stage .
+# 放弃暂存区所有的修改
 
 git clean -nfdx
 # n 模拟看看那些将被清除
