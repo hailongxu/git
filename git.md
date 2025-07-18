@@ -12,6 +12,12 @@ git push -u oragin local-br # 如果不加":"，代表本地分支名
 git brach <branch-name>
 git checkout -b <branch-name>
 git switch -c <branch-name>
+git branch -d <branch-name> # 删除分支
+git branch -D <branch-name> # 删除分支，即使未合并（没有理解）
+git branch -m <old-branch-name> <new-branch-name> # 换名字
+git branch -m <new-branch-name> # 更改当前分支的名字
+git push origin --delete <branch-name> # 删除远程分支
+git push origin :<branch-name> # 同上（老用法）
 ```
 
 # git 原理
@@ -82,6 +88,15 @@ git rebase --onto newbase from to
 # 和 git rebase的差异性在于
 # rebase 只是两个分支而言
 # onto 带有一个范围，前开后闭
+
+git rebase feat/xxx  # 当前branch是main
+# 如果 feat/xxx 的base就是main，也就是main之上，只有feat/xxx的提交
+# 也即，main分支落后于feat/xxx分支
+# 那么，执行上述命令就是fast-forward，
+# 就相当于，git merge --fast-forward, merge 默认的是也ff
+
+git rev-parse head~~^
+# 查看head~~^的commitid的值
 
 git log --format='%H %<(20,trunc)%s'
 ## 显示的内容在20个字符后截断，也就是最长显示20个字符内容
