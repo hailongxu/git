@@ -16,6 +16,8 @@ git branch -d <branch-name> # 删除分支
 git branch -D <branch-name> # 删除分支，即使未合并（没有理解）
 git branch -m <old-branch-name> <new-branch-name> # 换名字
 git branch -m <new-branch-name> # 更改当前分支的名字
+git branch --forece <branch-name> <another-branch-name>
+# 强行把branch-name分支，指向another-branch-name分支
 git push origin --delete <branch-name> # 删除远程分支
 git push origin :<branch-name> # 同上（老用法）
 ```
